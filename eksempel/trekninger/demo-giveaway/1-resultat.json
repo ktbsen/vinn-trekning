@@ -1,0 +1,27 @@
+{
+  "versjon": 1,
+  "algoritme": "kaytomas-vinn-v1",
+  "giveaway": "demo-giveaway",
+  "trekning": 1,
+  "listehash": "065bc0f67e00fb004e203663e12b04d35e80b2bc1b0289ea6bd21b495e4a43ef",
+  "antall": 180,
+  "tilfeldighet": {
+    "kilde": "drand quicknet",
+    "kjede": "52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971",
+    "runde": 32823389,
+    "tidspunkt": "2026-10-06T07:58:51.000Z",
+    "url": "https://api.drand.sh/52db9ba70e0cc0f6eaf7803dd07447a1f5477735fd3f661792ba94600c84e971/public/32823389",
+    "verdi": "bd02bf53ea103b1166deafede39ee3f6a05ea4bfdab1661bdf699d5866acb38d",
+    "signatur": "8f2cd238dba236b39240eeddc7425cfa5c1ae1fadafd51c63d918f861e15deb23d4904a279a43a3ea323e866c8299535"
+  },
+  "vinner": {
+    "lodd": "e48dec0ebfd5",
+    "plass": 166
+  },
+  "bevis": {
+    "melding": "kaytomas-vinn-v1|demo-giveaway|1|065bc0f67e00fb004e203663e12b04d35e80b2bc1b0289ea6bd21b495e4a43ef||bd02bf53ea103b1166deafede39ee3f6a05ea4bfdab1661bdf699d5866acb38d|0",
+    "sha256": "349054fe690dc2097c760605d12d3ce17c6de8d2d79a418191032ab6382ec7ca",
+    "forsok": 0
+  },
+  "trukket": "2026-10-06T07:58:54.537Z"
+}

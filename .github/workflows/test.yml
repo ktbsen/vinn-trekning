@@ -1,0 +1,32 @@
+name: Tester
+
+# Kjører testene av trekningskoden, og regner ut eksempeltrekningen på nytt
+# mot den ekte drand-runden den bruker.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Tester
+        run: npm test
+      - name: Eksempelet
+        run: node vinn.mjs verifiser --signatur
+        env:
+          VINN_TREKNINGER_DIR: eksempel/trekninger

@@ -1,0 +1,17 @@
+{
+  "name": "vinn-trekning",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Trekningslogikken for giveaways på kaytomas.no/vinn",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "devDependencies": {
+    "@noble/curves": "2.4.0"
+  }
+}
