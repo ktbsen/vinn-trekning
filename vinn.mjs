@@ -5,6 +5,9 @@
  *   node --env-file=<.env.local> vinn.mjs status [slug]
  *   node --env-file=<.env.local> vinn.mjs frys <slug> [--om <sekunder> | --kl <tidspunkt>] [--omtrekning]
  *   node --env-file=<.env.local> vinn.mjs trekk <slug> [--vent]
+ *
+ * Med --prove på frys og trekk kjøres en prøve på den ekte lista: alt leses og
+ * regnes ut, men ingen vinner lagres, og prøven ligger i sin egen mappe.
  *   node vinn.mjs verifiser [slug] [--signatur]
  *   node vinn.mjs rydd <slug>
  *
@@ -12,19 +15,39 @@
  * mappe (~/.kaytomas-vinn), aldri til dette repoet. Se README.md.
  */
 
+import { rm } from 'node:fs/promises';
+import { join } from 'node:path';
+
 import { apneDatabase } from './lib/database.mjs';
 import { Stopp, frys, privatMappe, rydd, status, tid, trekk, verifiser } from './lib/operasjoner.mjs';
 
-const privatDir = privatMappe();
-/** A missing or broken database adapter is a plain message, not a stack trace. */
-const database = () =>
-  apneDatabase().catch((e) => {
-    throw new Stopp(e.message);
-  });
-const dir = process.env.VINN_TREKNINGER_DIR || privatDir;
-
 const [kommando, ...rest] = process.argv.slice(2);
 const flagg = new Set(rest.filter((a) => a.startsWith('--')));
+
+// --prove is a rehearsal on the real list. It uses its own folder, so it can
+// never stand in the way of the real draw, and it never stores a winner.
+const prove = flagg.has('--prove');
+const privatDir = prove ? join(privatMappe(), 'prove') : privatMappe();
+const dir = prove ? privatDir : process.env.VINN_TREKNINGER_DIR || privatDir;
+
+/** A missing or broken database adapter is a plain message, not a stack trace. */
+async function database() {
+  const db = await apneDatabase().catch((e) => {
+    throw new Stopp(e.message);
+  });
+  if (!prove) return db;
+  // In a rehearsal the giveaway looks closed and undrawn, and saving is blocked.
+  const somStengt = (g) => (g ? { ...g, frist: new Date(0).toISOString(), trukket: null, seed: null } : g);
+  return {
+    ...db,
+    hentGiveaway: async (slug) => somStengt(await db.hentGiveaway(slug)),
+    hentGiveaways: async () => (await db.hentGiveaways()).map(somStengt),
+    lagreVinner: async () => {
+      throw new Stopp('En prøve lagrer aldri en vinner.');
+    },
+  };
+}
+
 const verdi = (navn) => {
   const i = rest.indexOf(navn);
   return i >= 0 ? rest[i + 1] : null;
@@ -88,7 +111,10 @@ async function main() {
     const om = verdi('--om');
     const kl = verdi('--kl');
     if (om !== null && !/^\d+$/.test(om)) throw new Stopp('--om skal være et antall sekunder.');
+    // A new rehearsal replaces the previous one.
+    if (prove) await rm(join(privatDir, slug), { recursive: true, force: true });
     const out = await frys({
+      prove,
       db: await database(),
       dir,
       privatDir,
@@ -98,14 +124,15 @@ async function main() {
       omtrekning: flagg.has('--omtrekning'),
     });
     console.log(`\nHjulet kan startes nå. Tallet fra drand kommer ${tid(out.forpliktelse.tilfeldighet.tidspunkt)}.`);
-    console.log(`Etter at hjulet har snurret: node --env-file=<.env.local> vinn.mjs trekk ${slug}`);
+    console.log(`Etter at hjulet har snurret: node --env-file=<.env.local> vinn.mjs trekk ${slug}${prove ? ' --prove' : ''}`);
     return;
   }
 
   if (kommando === 'trekk') {
     const signatur = await harSignaturPakke();
     if (!signatur) console.log('Merk: @noble/curves er ikke installert, så drand-signaturen sjekkes ikke. Kjør npm install.');
-    await trekk({ db: await database(), dir, privatDir, slug, vent: flagg.has('--vent'), signatur });
+    await trekk({ db: await database(), dir, privatDir, slug, vent: flagg.has('--vent'), signatur, prove });
+    if (prove) return;
     console.log(`\nAlt om trekningen ligger i ${dir}/${slug}.`);
     console.log(`Slett navnene til hjulet når premien er sendt: node vinn.mjs rydd ${slug}`);
     return;

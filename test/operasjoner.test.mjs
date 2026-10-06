@@ -168,3 +168,18 @@ test('rydd sletter navnene og beholder loggen', async () => {
   assert.deepEqual((await readdir(mappe)).sort(), ['1-forpliktelse.json', '1-resultat.json']);
   assert.equal(await verifiser({ dir: felles.dir, hent: o.hent, logg: stille, na: felles.na }), 0);
 });
+
+test('en prøve lagrer ingenting og viser ingen kontaktinfo', async () => {
+  const o = await oppsett();
+  await frys({ ...o.felles, prove: true });
+  o.klokke.t = new Date('2026-10-18T19:11:00.000Z');
+  const linjer = [];
+  const ut = await trekk({ ...o.felles, hent: o.hent, prove: true, logg: (l) => linjer.push(l) });
+  assert.equal(ut.lagret, false);
+  assert.equal(ut.kontakt, null);
+  const db = await o.les();
+  assert.equal(db.giveaways[0].vinner, null);
+  assert.equal(db.giveaways[0].seed, null);
+  assert.ok(!linjer.join('\n').includes('example.com'));
+  assert.ok(!linjer.join('\n').includes('Person'));
+});

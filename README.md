@@ -79,6 +79,8 @@ node --env-file=../kaytomas.com/.env.local vinn.mjs trekk keychron-g5
 node vinn.mjs rydd keychron-g5
 ```
 
+Med `--prove` på `frys` og `trekk` kjøres en prøve på den ekte lista. Alt leses og regnes ut, men ingen vinner lagres, og prøven ligger i sin egen mappe, så den aldri står i veien for den ekte trekningen.
+
 Alt om en trekning lagres i en lokal mappe hos arrangøren, utenfor alle repoer: den låste lista, resultatet og navnene til hjulet. `trekk` kan trygt kjøres flere ganger. Svaret er det samme hver gang.
 
 ## Lisens
