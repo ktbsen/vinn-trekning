@@ -29,7 +29,7 @@ Koden viser hvordan trekningen foregår. Siden listene ikke legges ut, kan ikke 
 
 ## Hvis vinneren ikke svarer
 
-Vinneren har 14 dager på å svare. Etter det trekkes det på nytt på samme måte, med en ny drand-runde. Lista er den samme som i første trekning, og alle tidligere vinnere er tatt ut.
+Vinneren har 7 dager på å svare. Etter det trekkes det på nytt på samme måte, med en ny drand-runde. Lista er den samme som i første trekning, og alle tidligere vinnere er tatt ut.
 
 ## Prøv selv
 
